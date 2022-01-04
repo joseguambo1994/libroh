@@ -68,10 +68,10 @@ export default function TabThreeScreen({ navigation }: RootTabScreenProps<'TabTh
   const addData = async () => {
     if (!areFieldsEmpty) {
       const docRef = await addDoc(collection(db, "books"), {
-        name: "Artificial intelligence algorithms",
-        author: "Grokking",
-        currentPage: 0,
-        totalPages: 232,
+        name: name,
+        author: author,
+        currentPage: currentPage,
+        totalPages: totalPages,
       });
       docRef;
     }
@@ -86,9 +86,6 @@ export default function TabThreeScreen({ navigation }: RootTabScreenProps<'TabTh
       });
       docRef;
   }
-
-  console.log("Before return")
-
 
   return (
    <View style={styles.container}>

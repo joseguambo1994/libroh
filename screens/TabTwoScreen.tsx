@@ -70,6 +70,12 @@ export default function TabTwoScreen({ navigation }: RootTabScreenProps<'TabTwo'
     return unsubscribe;
   }, [navigation]);
 
+
+  function getPercentage(currentPage:number, totalPages:number):number{
+    return currentPage/totalPages;
+  }
+
+
   return (
    <ScrollView>
 
@@ -84,7 +90,9 @@ export default function TabTwoScreen({ navigation }: RootTabScreenProps<'TabTwo'
      </TouchableOpacity>
       <View style={styles.container}>
       {
-        array.map( ( item:IBook ) => {
+        array.sort((a:IBook, b:IBook)=> 
+        getPercentage(b.currentPage,b.totalPages) - getPercentage(a.currentPage,a.totalPages)
+        ).map( ( item:IBook ) => {
           return <Book 
             bookId={item.bookId}
             name={item.name}

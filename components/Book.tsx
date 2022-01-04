@@ -1,5 +1,6 @@
 import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
+import { LinearGradient } from 'expo-linear-gradient';
 
 type BookProps = {
   bookId: string,
@@ -9,12 +10,22 @@ type BookProps = {
     totalPages: number,
 }
 
+
+
 const Book = (props: BookProps) => {
+
+  function getPercentage(currentPage:number, totalPages:number):number{
+    return currentPage/totalPages;
+  }
 
   const navigation = useNavigation();
   return (
-    <TouchableOpacity style={styles.container}
-    onPress={() => {
+    <LinearGradient style={styles.container}
+    start={[0, 1]} 
+    end={[1, 0]}
+    locations={[0,getPercentage(props.currentPage,props.totalPages),1]}
+    colors={['purple', 'white', 'white']}
+    onTouchEnd={() => {
       navigation.navigate(
         'Root',
         { screen:'TabThree', params:{bookId:props.bookId}}
@@ -35,7 +46,7 @@ const Book = (props: BookProps) => {
             {props.currentPage + ' / '+ props.totalPages}
         </Text>
         </View>
-    </TouchableOpacity>
+    </LinearGradient>
   );
 }
 
