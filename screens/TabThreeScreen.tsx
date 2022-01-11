@@ -1,15 +1,11 @@
 import { Text, StyleSheet, TouchableOpacity, View, TextInput } from 'react-native';
 import { Dimensions } from 'react-native';
-import { collection, addDoc, setDoc } from "firebase/firestore"; 
+import { collection, addDoc, setDoc, deleteDoc } from "firebase/firestore"; 
 import db from '../firebase';
 import { useEffect, useState } from 'react';
 import _ from 'lodash'; 
 import { doc, getDoc } from "firebase/firestore";
 import { RootTabScreenProps } from '../types';
-
-
-// Add a new document with a generated id.
-
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -19,7 +15,6 @@ export default function TabThreeScreen({ navigation }: RootTabScreenProps<'TabTh
   const [author, setAuthor] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [bookId, setBookId] = useState('');
   
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -62,19 +57,19 @@ export default function TabThreeScreen({ navigation }: RootTabScreenProps<'TabTh
   }
 
   const areFieldsEmpty = ():boolean => {
-    return name == '' && author == ''
+    return (_.isNil(name) || name == '') && (_.isNil(author) || author == '')
   }
 
   const addData = async () => {
-    if (!areFieldsEmpty) {
+    if (!areFieldsEmpty()){
       const docRef = await addDoc(collection(db, "books"), {
         name: name,
         author: author,
         currentPage: currentPage,
         totalPages: totalPages,
       });
-      docRef;
-    }
+      console.log("Document written with ID: ", docRef.id);
+  }
   }
 
   const updateData = async () => {
@@ -85,6 +80,15 @@ export default function TabThreeScreen({ navigation }: RootTabScreenProps<'TabTh
         totalPages: totalPages,
       });
       docRef;
+  }
+
+  const deleteData = async () => {
+    const docRef = await deleteDoc(doc(db, "books", getBookId()));
+    docRef;
+}
+
+  function navigateToSecondScreen(){
+    navigation.navigate('TabTwo');
   }
 
   return (
@@ -112,9 +116,23 @@ export default function TabThreeScreen({ navigation }: RootTabScreenProps<'TabTh
       keyboardType='numeric'
       ></TextInput>
       {
-        getBookId() != '' ?     <TouchableOpacity style={styles.addButton} onPressOut={()=>updateData()}>
+        getBookId() != '' ?     <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.addButton} onPressOut={()=>{
+            updateData();
+            navigateToSecondScreen();
+          }}>
        <Text>Editar</Text>
-     </TouchableOpacity> : <TouchableOpacity style={styles.addButton} onPressOut={()=>addData()}>
+     </TouchableOpacity>
+     <TouchableOpacity style={styles.addButton} onPressOut={()=>{
+       navigateToSecondScreen();
+       navigateToSecondScreen();
+     }}>
+       <Text>Eliminar</Text>
+     </TouchableOpacity>
+        </View> : <TouchableOpacity style={styles.addButton} onPressOut={()=>{
+          addData();
+          navigateToSecondScreen();
+        }}>
         <Text>Agregar</Text>
       </TouchableOpacity>
       }
@@ -152,5 +170,9 @@ const styles = StyleSheet.create({
   label:{
     color:'white',
     fontSize: 20
+  },
+  buttonsContainer:{
+    flexDirection:'row',
+    justifyContent:'space-between'
   }
 });
